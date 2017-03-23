@@ -3,7 +3,7 @@ $(document).ready(function(){
 	var destination;
 	var firstTrainTime;
 	var frequency;
-	var nextArrival;
+  var nextArrival;
 	var minutesAway;
 	var config = {
     apiKey: "AIzaSyBBlNyBCw4rjTon4x3wDG7Yg9KFgt6GG7U",
@@ -19,17 +19,26 @@ $(document).ready(function(){
   	tr.append("<td>" + snapshot.val().trainName + "</td>");
   	tr.append("<td>" + snapshot.val().destination + "</td>");
   	tr.append("<td>" + snapshot.val().frequency + "</td>");
-  	frequency = moment(frequency).format("mm");
-  	nextArrival = 
-  	$("#table-body").append(tr);
+
+	var trainTime = moment(snapshot.val().firstTrainTime, 'HH:mm');
+  var now = moment();
+	var timeDiff = moment().diff(trainTime, "minutes");
+  var remainder = timeDiff % frequency;
+  minutesAway = frequency - remainder;
+  nextArrival = moment(now).add(minutesAway, "m");
+  console.log(nextArrival.format("HH:mm"));
+	
+  tr.append("<td>" + nextArrival.format("HH:mm") + "</td>");
+  tr.append("<td>" + minutesAway + "</td>");
+	
+
+  $("#table-body").append(tr);
 
   })
   $(document).on("click", "#submit-btn", function(){
   	trainName = $("#name-input").val().trim();
   	destination = $("#destination-input").val().trim();
   	firstTrainTime = $("#first-train-input").val().trim();
-  	firstTrainTime = moment(firstTrainTime).format("hh:mm a");
-  	console.log(firstTrainTime);
   	frequency = $("#frequency-input").val().trim();
 
   	database.ref().push({
